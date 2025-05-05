@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - HospitalServ</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="logo">HospitalServ</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active" data-target="dashboard">
+                        <a href="#">
+                            <i class="fas fa-th-large nav-icon"></i> <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-target="patients">
+                        <a href="#">
+                             <i class="fas fa-users nav-icon"></i> <span>Patients</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-target="schedule">
+                        <a href="#">
+                            <i class="fas fa-calendar-alt nav-icon"></i> <span>Schedule</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-target="procedures">
+                        <a href="#">
+                            <i class="fas fa-procedures nav-icon"></i> <span>Procedures</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-target="medications">
+                        <a href="#">
+                             <i class="fas fa-pills nav-icon"></i> <span>Medications</span>
+                        </a>
+                    </li>
+                     <li class="nav-item" data-target="reports">
+                        <a href="#">
+                             <i class="fas fa-chart-line nav-icon"></i> <span>Reports</span>
+                        </a>
+                    </li>
+                    <li class="nav-item inaccessible" data-target="users" id="nav-users"> <a href="#">
+                            <i class="fas fa-user-cog nav-icon"></i> <span>Users</span>
+                            <i class="fas fa-lock lock-icon"></i> </a>
+                    </li>
+                    <li class="nav-item inaccessible" data-target="pending-registrations" id="nav-pending">
+                        <a href="#">
+                            <i class="fas fa-user-clock nav-icon"></i> <span>Pending Reg.</span>
+                            <i class="fas fa-lock lock-icon"></i> </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <div id="roleSelectionModal" class="modal">
+            <div class="modal-content role-modal-content"> <span class="close-btn" onclick="closeModal('roleSelectionModal')">&times;</span>
+                <h3>Assign Role</h3>
+                <p>Please select the role for the user you are approving:</p>
+                <div class="form-group">
+                    <label for="modalSelectedRole">Role:</label>
+                    <select id="modalSelectedRole" name="role">
+                        <option value="Doctor">Doctor</option>
+                        <option value="Registrar">Registrar</option>
+                        <option value="Nurse">Nurse</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                     <button type="button" id="confirmRoleBtn" class="btn-confirm-role">Confirm Approval</button>
+                     <button type="button" onclick="closeModal('roleSelectionModal')" class="btn-cancel">Cancel</button>
+                </div>
+                 <p id="roleSelectError" class="error-message" style="display: none;"></p>
+            </div>
+        </div>
+
+        <main class="main-content">
+            <header class="main-header">
+                <div class="page-title" id="pageTitle">Dashboard</div>
+                <div class="user-profile">
+                    <div class="user-details">
+                        <span class="user-role" id="userRole">Doctor</span>
+                        <span class="user-name" id="userName">Alexandra Toriati</span>
+                    </div>
+                    <div class="user-icon-wrapper" id="userIconWrapper">
+                        <div class="user-icon" id="userIcon">
+                             </div>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <a href="#" id="logoutButton">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="content-area" id="contentArea">
+                <div class="content-block dashboard-view" id="dashboard-content-doctor" style="display: none;">
+                    <div class="block-section appointments-section">
+                        <h2 class="block-title">Upcoming appointments</h2>
+                        <div class="block-body" id="doctor-upcoming-appointments">
+                            <p>Loading appointments...</p>
+                        </div>
+                    </div>
+            
+                     <div class="block-section patients-section">
+                        <h2 class="block-title">My patients</h2>
+                        <div class="block-body patients-slider">
+                             <button class="arrow arrow-prev"><i class="fas fa-chevron-left"></i></button>
+                             <div class="patients-card-container" id="doctor-quick-patients">
+                                 <p>Loading patients...</p>
+                             </div>
+                             <button class="arrow arrow-next"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                     </div>
+            
+                <div class="content-block dashboard-view" id="dashboard-content-registrar" style="display: none;">
+                     <h2 class="dashboard-title-registrar">Registrar Dashboard</h2>
+                     <div class="registrar-widgets">
+                         <div class="widget">
+                             <h3>Today's Schedule Overview</h3>
+                             <div id="registrar-schedule-summary">Loading schedule...</div>
+                             <button onclick="forceSwitchContent('schedule')">View Full Schedule</button>
+                         </div>
+                         <div class="widget">
+                             <h3>Patient Actions</h3>
+                             <input type="search" id="registrar-patient-search" placeholder="Search Patients...">
+                             <button id="registrarAddPatientBtn">Add New Patient</button>
+                             <div id="registrar-search-results"></div>
+                         </div>
+                         <div class="widget">
+                             <h3>Appointments Today</h3>
+                             <p>Total: <span id="registrar-total-appts">...</span></p>
+                             <p>Checked-in: <span id="registrar-checkedin-appts">...</span></p>
+                         </div>
+                     </div>
+                </div>
+            
+                <div class="content-block dashboard-view" id="dashboard-content-admin" style="display: none;">
+                     <h2 class="dashboard-title-admin">Administrator Dashboard</h2>
+                     <div class="admin-stats-container">
+                         <div class="stat-card">
+                             <i class="fas fa-users stat-icon"></i>
+                             <div class="stat-value" id="admin-stat-total-users">...</div>
+                             <div class="stat-label">Total Users</div>
+                         </div>
+                          <div class="stat-card">
+                             <i class="fas fa-user-clock stat-icon"></i>
+                             <div class="stat-value" id="admin-stat-pending-reg">...</div>
+                             <div class="stat-label">Pending Registrations</div>
+                             <a href="#" onclick="forceSwitchContent('pending-registrations')" class="stat-link">View</a>
+                         </div>
+                          <div class="stat-card">
+                             <i class="fas fa-hospital-user stat-icon"></i>
+                             <div class="stat-value" id="admin-stat-total-patients">...</div>
+                             <div class="stat-label">Total Patients</div>
+                              <a href="#" onclick="forceSwitchContent('patients')" class="stat-link">View</a>
+                         </div>
+                         <div class="stat-card">
+                             <i class="fas fa-calendar-check stat-icon"></i>
+                             <div class="stat-value" id="admin-stat-appts-today">...</div>
+                             <div class="stat-label">Appointments Today</div>
+                             <a href="#" onclick="forceSwitchContent('schedule')" class="stat-link">View</a>
+                         </div>
+                     </div>
+                     <div class="admin-quick-actions">
+                         <h3>Quick Actions</h3>
+                         <button onclick="forceSwitchContent('users')">Manage Users</button>
+                         <!--<button onclick="alert('System Settings (not implemented)')">System Settings</button>
+                         <button onclick="alert('View Logs (not implemented)')">View Activity Logs</button> -->
+                     </div>
+                </div>
+            
+                <div class="content-block" id="patients-content" style="display: none;">
+                    <h2>Patients List</h2>
+
+                    <div class="filter-controls" style="margin-bottom: 15px; background-color: #e9f1f1; padding: 15px; border-radius: 8px; display: flex; flex-wrap: wrap; align-items: center; gap: 15px;">
+                        <div style="flex: 1 1 250px;"> <label for="patientSearchInput" style="display: block; margin-bottom: 5px; font-weight: 500;">Пошук:</label>
+                            <input type="search" id="patientSearchInput" placeholder="Ім'я, ID, карта, телефон..." style="width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px;">
+                        </div>
+
+                        <div style="flex: 1 1 300px; display: flex; gap: 10px; align-items: flex-end;">
+                            <div style="flex: 1;">
+                                <label for="dobFromInput" style="display: block; margin-bottom: 5px; font-weight: 500;">Дата народж. (від):</label>
+                                <input type="date" id="dobFromInput" style="width: 100%; padding: 7px 10px; border: 1px solid #ccc; border-radius: 5px;">
+                            </div>
+                             <div style="flex: 1;">
+                                <label for="dobToInput" style="display: block; margin-bottom: 5px; font-weight: 500;">Дата народж. (до):</label>
+                                <input type="date" id="dobToInput" style="width: 100%; padding: 7px 10px; border: 1px solid #ccc; border-radius: 5px;">
+                            </div>
+                        </div>
+
+                         <div style="flex: 0 0 auto; display: flex; align-items: flex-end; gap: 10px; padding-top: 25px;"> <button id="applyFilterBtn" class="btn-action" style="background-color: #0C828E; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; height: 36px;">Застосувати</button>
+                            <button id="clearFilterBtn" class="btn-action" style="background-color: #6c757d; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; height: 36px;">Скинути</button>
+                        </div>
+                    </div>
+                    <button id="addPatientBtn" class="btn-add-user" style="display: none;">Add New Patient</button>
+                    <div id="patientTableContainer">
+                        <p>Loading patients...</p>
+                    </div>
+                </div>
+
+    <div id="patientModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('patientModal')">&times;</span>
+            <h3 id="patientModalTitle">Patient Form</h3>
+            <form id="patientForm">
+                <input type="hidden" id="patientId" name="patientId">
+                <div class="form-group">
+                    <label for="modalPatientFullName">Full Name:*</label>
+                    <input type="text" id="modalPatientFullName" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="modalPatientDOB">Date of Birth:*</label>
+                    <input type="date" id="modalPatientDOB" name="dateOfBirth" required>
+                </div>
+                <div class="form-group">
+                    <label for="modalPatientGender">Gender:</label>
+                    <select id="modalPatientGender" name="gender">
+                        <option value="">Select...</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="modalPatientAddress">Address:</label>
+                    <input type="text" id="modalPatientAddress" name="address">
+                </div>
+                <div class="form-group">
+                    <label for="modalPatientPhone">Phone Number:</label>
+                    <input type="tel" id="modalPatientPhone" name="phoneNumber">
+                </div>
+                <div class="form-group">
+                    <label for="modalPatientCard">Medical Card Number:</label>
+                    <input type="text" id="modalPatientCard" name="medicalCardNumber">
+                </div>
+                 <div class="form-group" id="patientStatusGroup" style="display: none;">
+                     <label for="modalPatientStatus">Status:</label>
+                     <select id="modalPatientStatus" name="status">
+                         <option value="Active">Active</option>
+                         <option value="Inactive">Inactive</option>
+                     </select>
+                 </div>
+                <p id="patientFormError" class="error-message" style="display: none;"></p>
+                <div class="modal-actions">
+                     <button type="submit" id="savePatientBtn" class="btn-confirm-role">Save Patient</button>
+                     <button type="button" onclick="closeModal('patientModal')" class="btn-cancel">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="content-block" id="schedule-content" style="display: none;">
+        <h2>Appointments Schedule</h2>
+
+        <div class="filter-controls schedule-filters" style="margin-bottom: 20px; background-color: #e9f1f1; padding: 15px; border-radius: 8px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 15px;">
+             <div style="flex: 1 1 150px;">
+                <label for="scheduleDateFromFilter">Date (From):</label>
+                <input type="date" id="scheduleDateFromFilter">
+            </div>
+            <div style="flex: 1 1 150px;">
+                <label for="scheduleDateToFilter">Date (To):</label>
+                <input type="date" id="scheduleDateToFilter">
+            </div>
+            <div style="flex: 1 1 200px;">
+                <label for="scheduleDoctorFilter">Doctor:</label>
+                <select id="scheduleDoctorFilter">
+                    <option value="">All Doctors</option>
+                    </select>
+            </div>
+             <div style="flex: 1 1 200px; position: relative;"> <label for="schedulePatientFilterSearch">Patient:</label>
+                <input type="text" id="schedulePatientFilterSearch" placeholder="All Patients (Search...)">
+                <input type="hidden" id="schedulePatientFilterId">
+                <div id="schedulePatientFilterResults" class="search-results"></div> </div>
+            <div style="flex: 1 1 150px;">
+                <label for="scheduleStatusFilter">Status:</label>
+                <select id="scheduleStatusFilter">
+                    <option value="">All Statuses</option>
+                    <option value="Scheduled">Scheduled</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled by Patient">Cancelled by Patient</option>
+                    <option value="Cancelled by Doctor">Cancelled by Doctor</option>
+                    <option value="No Show">No Show</option>
+                </select>
+            </div>
+            <div style="flex: 0 0 auto;">
+                <button id="applyScheduleFilterBtn" class="btn-action" style="background-color: #0C828E;">Apply</button>
+                <button id="clearScheduleFilterBtn" class="btn-action" style="background-color: #6c757d;">Clear</button>
+            </div>
+        </div>
+
+        <button id="addAppointmentBtn" class="btn-add-user" style="margin-bottom: 15px; display: none;"> <i class="fas fa-plus"></i> Add New Appointment
+        </button>
+
+        <div id="scheduleTableContainer">
+            <p>Loading schedule...</p>
+            </div>
+    </div> <div id="appointmentModal" class="modal">
+         <div class="modal-content">
+             <span class="close-btn" onclick="closeModal('appointmentModal')">&times;</span>
+             <h3 id="appointmentModalTitle">Appointment Form</h3>
+             <form id="appointmentForm">
+                 <input type="hidden" id="modalAppointmentId" name="appointmentId"> <div class="form-group">
+                     <label for="modalAppointmentPatientSearch">Patient:*</label>
+                     <input type="text" id="modalAppointmentPatientSearch" placeholder="Search Patient by Name/ID..." required>
+                     <input type="hidden" id="modalAppointmentPatientId" name="patientId" required>
+                     <div id="modalAppointmentPatientResults" class="search-results"></div>
+                 </div>
+
+                 <div class="form-group">
+                     <label for="modalAppointmentDoctor">Doctor:*</label>
+                     <select id="modalAppointmentDoctor" name="doctorId" required>
+                         <option value="">Loading doctors...</option>
+                         </select>
+                 </div>
+
+                 <div class="form-group">
+                     <label for="modalAppointmentDateTime">Date and Time:*</label>
+                     <input type="datetime-local" id="modalAppointmentDateTime" name="appointmentDateTime" required style="width: auto;">
+                     <div id="appointmentTimeStatus" style="font-size: 0.9em; margin-top: 5px;"></div>
+
+                 </div>
+
+                 <div class="form-group">
+                     <label for="modalAppointmentDuration">Duration (minutes):</label>
+                     <input type="number" id="modalAppointmentDuration" name="durationMinutes" value="30" min="5" step="5"> </div>
+
+                 <div class="form-group">
+                     <label for="modalAppointmentReason">Reason for Visit:</label>
+                     <textarea id="modalAppointmentReason" name="reasonForVisit" rows="3"></textarea>
+                 </div>
+
+                 <div id="editAppointmentFields" style="display: none;">
+                     <div class="form-group">
+                         <label for="modalAppointmentStatus">Status:</label>
+                         <select id="modalAppointmentStatus" name="status">
+                            <option value="Scheduled">Scheduled</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Cancelled by Patient">Cancelled by Patient</option>
+                            <option value="Cancelled by Doctor">Cancelled by Doctor</option>
+                            <option value="No Show">No Show</option>
+                         </select>
+                     </div>
+                     <div class="form-group">
+                         <label for="modalAppointmentConclusions">Doctor's Conclusions:</label>
+                         <textarea id="modalAppointmentConclusions" name="doctorConclusions" rows="4" readonly></textarea> </div>
+                 </div>
+
+
+                 <p id="appointmentFormError" class="error-message" style="display: none;"></p>
+                 <div class="modal-actions">
+                     <button type="submit" id="saveAppointmentBtn" class="btn-confirm-role">Save Appointment</button>
+                     <button type="button" onclick="closeModal('appointmentModal')" class="btn-cancel">Cancel</button>
+                 </div>
+             </form>
+         </div>
+     </div>
+                <div class="content-block" id="procedures-content" style="display: none;">
+                    <h2>Medical Procedures</h2>
+
+                    <div class="view-toggle" style="margin-bottom: 20px;">
+                        <button class="btn-toggle active" data-view="assigned">Assigned Procedures</button>
+                        <button class="btn-toggle" data-view="directory">Procedure Directory</button>
+                    </div>
+
+                    <div id="assigned-procedures-view">
+                        <h3>Assigned Procedures</h3>
+                        <div class="filter-controls assigned-procedures-filters" style="margin-bottom: 15px; background-color: #e9f1f1; padding: 15px; border-radius: 8px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 15px;">
+                            <div style="flex: 1 1 150px;">
+                                <label for="assignedProcPatientFilter">Patient:</label>
+                                <input type="text" id="assignedProcPatientFilter" placeholder="Patient ID or Name...">
+                                <input type="hidden" id="assignedProcPatientId"> </div>
+                            <div style="flex: 1 1 120px;">
+                                <label for="assignedProcStatusFilter">Status:</label>
+                                <select id="assignedProcStatusFilter">
+                                    <option value="">All</option>
+                                    <option value="Assigned">Assigned</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div style="flex: 1 1 150px;">
+                                <label for="assignedProcDateFromFilter">Assigned Date (From):</label>
+                                <input type="date" id="assignedProcDateFromFilter">
+                            </div>
+                            <div style="flex: 1 1 150px;">
+                                <label for="assignedProcDateToFilter">Assigned Date (To):</label>
+                                <input type="date" id="assignedProcDateToFilter">
+                            </div>
+                            <div style="flex: 0 0 auto;">
+                                <button id="applyAssignedProcFilterBtn" class="btn-action" style="background-color: #0C828E;">Apply</button>
+                                <button id="clearAssignedProcFilterBtn" class="btn-action" style="background-color: #6c757d;">Clear</button>
+                            </div>
+                        </div>
+                        <div id="assignedProceduresContainer">
+                            <p>Loading assigned procedures...</p>
+                        </div>
+                         <button id="assignNewProcedureBtn" class="btn-add-user" style="margin-top: 15px;">Assign New Procedure</button>
+                    </div>
+
+                    <div id="procedure-directory-view" style="display: none;">
+                         <h3>Procedure Directory</h3>
+                         <div id="procedureDirectoryContainer">
+                             <p>Loading procedure directory...</p>
+                         </div>
+                    </div>
+
+                </div> <div id="assignProcedureModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-btn" onclick="closeModal('assignProcedureModal')">&times;</span>
+                        <h3>Assign Procedure</h3>
+                        <form id="assignProcedureForm">
+                            <div class="form-group">
+                                <label for="modalAssignPatient">Patient:*</label>
+                                <input type="text" id="modalAssignPatientSearch" placeholder="Search Patient by Name/ID...">
+                                <input type="hidden" id="modalAssignPatientId" name="patientId" required>
+                                <div id="modalAssignPatientResults" class="search-results"></div> </div>
+                            <div class="form-group">
+                                <label for="modalAssignProcedure">Procedure:*</label>
+                                <select id="modalAssignProcedure" name="procedureId" required>
+                                    <option value="">Loading procedures...</option>
+                                    </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="modalAssignAppointment">Associated Appointment (ID):*</label>
+                                <input type="number" id="modalAssignAppointment" name="appointmentId" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="modalAssignExecutor">Executor (Optional):</label>
+                                <input type="text" id="modalAssignExecutorSearch" placeholder="Search Employee by Name/ID...">
+                                <input type="hidden" id="modalAssignExecutorId" name="executorId">
+                                <div id="modalAssignExecutorResults" class="search-results"></div>
+                            </div>
+                            <p id="assignProcedureFormError" class="error-message" style="display: none;"></p>
+                            <div class="modal-actions">
+                                <button type="submit" id="saveAssignProcedureBtn" class="btn-confirm-role">Assign</button>
+                                <button type="button" onclick="closeModal('assignProcedureModal')" class="btn-cancel">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                 </div>
+
+                 <div id="updateProcedureStatusModal" class="modal">
+                    <div class="modal-content">
+                         <span class="close-btn" onclick="closeModal('updateProcedureStatusModal')">&times;</span>
+                         <h3 id="updateProcedureStatusTitle">Update Procedure Status</h3>
+                         <form id="updateProcedureStatusForm">
+                             <input type="hidden" id="updateAssignmentId" name="assignmentId">
+                             <div class="form-group">
+                                 <label>Patient:</label>
+                                 <p id="modalUpdatePatientInfo"></p>
+                             </div>
+                             <div class="form-group">
+                                 <label>Procedure:</label>
+                                 <p id="modalUpdateProcedureInfo"></p>
+                             </div>
+                             <div class="form-group">
+                                 <label for="modalUpdateStatus">New Status:*</label>
+                                 <select id="modalUpdateStatus" name="executionStatus" required>
+                                     <option value="Assigned">Assigned</option>
+                                     <option value="In Progress">In Progress</option>
+                                     <option value="Completed">Completed</option>
+                                     <option value="Cancelled">Cancelled</option>
+                                 </select>
+                             </div>
+                             <div class="form-group">
+                                 <label for="modalUpdateResult">Result/Notes:</label>
+                                 <textarea id="modalUpdateResult" name="result" rows="3"></textarea>
+                             </div>
+                             <p id="updateProcedureStatusFormError" class="error-message" style="display: none;"></p>
+                             <div class="modal-actions">
+                                 <button type="submit" id="saveUpdateProcedureStatusBtn" class="btn-confirm-role">Update Status</button>
+                                 <button type="button" onclick="closeModal('updateProcedureStatusModal')" class="btn-cancel">Cancel</button>
+                             </div>
+                         </form>
+                     </div>
+                 </div>
+
+                <div class="content-block" id="medications-content" style="display: none;">
+                    <h2>Medications Directory</h2>
+
+                    <div class="filter-controls" style="margin-bottom: 20px; background-color: #e9f1f1; padding: 15px; border-radius: 8px; display: flex; align-items: center; gap: 15px;">
+                        <div style="flex-grow: 1;">
+                            <label for="medicationSearchInput" style="display: block; margin-bottom: 5px; font-weight: 500;">Search Medications:</label>
+                            <input type="search" id="medicationSearchInput" placeholder="Name, substance, manufacturer..." style="width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px;">
+                        </div>
+                        <div style="flex-shrink: 0;">
+                             <button id="clearMedicationSearchBtn" class="btn-action" style="background-color: #6c757d; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; height: 36px; margin-top: 23px;">Clear</button>
+                        </div>
+                    </div>
+
+                    <div id="medicationListContainer">
+                        <p>Loading medications...</p>
+                        </div>
+                </div>
+                <div class="content-block" id="reports-content" style="display: none;">
+                    <h2>Reports</h2>
+            
+                    <div class="filter-controls reports-filters" style="margin-bottom: 20px; background-color: #e9f1f1; padding: 15px; border-radius: 8px; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 15px;">
+                        <div style="flex: 1 1 150px;">
+                            <label for="reportDateFrom">Date From:*</label>
+                            <input type="date" id="reportDateFrom" required>
+                        </div>
+                        <div style="flex: 1 1 150px;">
+                            <label for="reportDateTo">Date To:*</label>
+                            <input type="date" id="reportDateTo" required>
+                        </div>
+                        <div style="flex: 1 1 200px;">
+                            <label for="reportType">Report Type:</label>
+                            <select id="reportType">
+                                <option value="appointmentsByDoctor" selected>Appointments by Doctor</option>
+                                </select>
+                        </div>
+                        <div style="flex: 0 0 auto;">
+                            <button id="generateReportBtn" class="btn-action" style="background-color: #0C828E;">Generate Report</button>
+                        </div>
+                    </div>
+            
+                    <div id="reportResultsContainer">
+                        <p>Please select filters and generate a report.</p>
+                    </div>
+            
+                    <div id="reportChartContainer" style="margin-top: 30px; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <h3>Report Chart</h3>
+                        <canvas id="reportChartCanvas"></canvas> </div>
+            
+                    <div style="margin-top: 20px;">
+                         <button id="exportReportBtn" class="btn-action" style="background-color: #6c757d;" disabled>Export Data (Not Implemented)</button>
+                     </div>
+            
+                </div>
+                <div class="content-block" id="users-content" style="display: none;">
+                    <h2>User Management</h2>
+                     <button id="addUserBtn" class="btn-add-user">Add New User</button>
+                     <div id="userTableContainer">
+                        <p>Loading users...</p>
+                     </div>
+                </div>
+                <div class="content-block" id="pending-registrations-content" style="display: none;">
+                    <h2>Pending Registrations</h2>
+                    <div id="pendingUsersContainer">
+                         <p>Loading pending requests...</p>
+                    </div>
+                </div>
+
+                <div id="userModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-btn" onclick="closeModal('userModal')">&times;</span>
+                        <h2 id="modalTitle">User Form</h2>
+                        <form id="userForm">
+                            <input type="hidden" id="userId">
+                            <div class="form-group">
+                                <label for="modalFullName">Full Name:</label>
+                                <input type="text" id="modalFullName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="modalUsername">Username:</label>
+                                <input type="text" id="modalUsername" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="modalEmail">Email:</label>
+                                <input type="email" id="modalEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="modalPassword">Password (leave blank to keep unchanged):</label>
+                                <input type="password" id="modalPassword">
+                            </div>
+                            <div class="form-group">
+                                <label for="modalRole">Role:</label>
+                                <select id="modalRole" required>
+                                    <option value="Doctor">Doctor</option>
+                                    <option value="Registrar">Registrar</option>
+                                    <option value="Admin">Admin</option>
+                                    </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="modalStatus">Status:</label>
+                                <select id="modalStatus" required>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
+                                    <option value="PendingApproval" disabled>Pending Approval</option>
+                                </select>
+                            </div>
+                            <p id="userFormError" class="error-message" style="display: none;"></p>
+                            <button type="submit" id="saveUserBtn">Save User</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="content-block" id="pending-registrations-content" style="display: none;">
+                    </div>
+            
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

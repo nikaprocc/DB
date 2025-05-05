@@ -1,0 +1,104 @@
+body {
+    font-family: 'Montserrat', sans-serif; /* Використовуємо шрифт з вашого дизайну */
+    background-color: #D9E9E9; /* Колір фону з вашого дизайну */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 450px; /* Обмежуємо ширину форми */
+    padding: 30px;
+}
+
+.auth-form {
+    background-color: #ffffff; /* Білий фон для форми */
+    padding: 30px 40px;
+    border-radius: 15px; /* Закруглені кути */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Тінь для об'єму */
+    text-align: center;
+}
+
+.auth-form h2 {
+    color: #182919; /* Темний колір заголовку */
+    margin-bottom: 25px;
+    font-weight: 600; /* Напівжирний шрифт */
+    font-size: 28px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left; /* Вирівнювання тексту в групі по лівому краю */
+}
+
+.form-group label {
+    display: block; /* Лейбл на окремому рядку */
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 500; /* Середня жирність */
+    font-size: 16px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px 15px; /* Відступи всередині полів */
+    border: 1px solid #ccc;
+    border-radius: 8px; /* Закруглені кути полів */
+    box-sizing: border-box; /* Щоб padding не збільшував ширину */
+    font-size: 16px;
+}
+
+.form-group input:focus {
+    border-color: #0C828E; /* Колір рамки при фокусі */
+    outline: none; /* Прибираємо стандартний контур */
+    box-shadow: 0 0 5px rgba(12, 130, 142, 0.3); /* Легка тінь при фокусі */
+}
+
+button[type="submit"] {
+    background-color: #0C828E; /* Колір кнопки з вашого дизайну */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+    width: 100%; /* Кнопка на всю ширину */
+    margin-top: 10px;
+    transition: background-color 0.3s ease; /* Плавна зміна кольору */
+}
+
+button[type="submit"]:hover {
+    background-color: #0a6873; /* Темніший відтінок при наведенні */
+}
+
+.switch-auth {
+    margin-top: 25px;
+    font-size: 15px;
+    color: #555;
+}
+
+.switch-auth a {
+    color: #0C828E; /* Колір посилання */
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.switch-auth a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: #dc3545; /* Червоний колір для помилок */
+    font-size: 14px;
+    margin-top: 15px;
+}
+.message {
+    color: #28a745; /* Зелений для повідомлень */
+     font-size: 14px;
+    margin-top: 15px;
+}
